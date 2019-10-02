@@ -190,7 +190,7 @@ namespace minesweeper.net
         {
             if (temp != null)
             {
-                if ((previousPosition.X != e.X / 16 || previousPosition.Y != e.Y / 16))
+                if (previousPosition.X != e.X / 16 || previousPosition.Y != e.Y / 16)
                 {
                     TableDisplay.Image = temp;
                     TableDisplay.Refresh();
@@ -236,7 +236,6 @@ namespace minesweeper.net
                     {
                         MouseDownAction(e);
                     }
-
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
@@ -297,8 +296,45 @@ namespace minesweeper.net
                 else
                 {
                     TableDisplay.Image = temp;
+                    previousPosition = new Point(-1, -1);
                     TableDisplay.Refresh();
                 }
+            }
+        }
+
+        void CheckVictory()
+        {
+            int cnt = 0;
+            int cnt2 = 0;
+            foreach (var element in GameTableArrayVisible)
+            {
+                if (element == State.Flag || element == State.Normal)
+                    cnt++;
+            }
+            foreach (var element in GameTableArrayVisible)
+            {
+                if (element == State.Question)
+                    cnt2++;
+            }
+            if (cnt == Settings.Default.StartMines && cnt2==0)
+            {
+                timer1.Enabled = false;
+                MainBtn.Image = Face(Faces.Win);
+                ignore = true;
+
+                Bitmap act = (Bitmap)TableDisplay.Image;
+                for (int x = 0; x < Settings.Default.StartSize.Width; x++)
+                {
+                    for (int y = 0; y < Settings.Default.StartSize.Height; y++)
+                    {
+                        if (GameTableArrayVisible[x, y] == State.Normal)
+                        {
+                            GameTableArrayVisible[x, y] = State.Flag;
+                            FastGraphicsOver(act, x * 16, y * 16, Buttons[(int)State.Flag]);
+                        }
+                    }
+                }
+                TableDisplay.Refresh();
             }
         }
 
@@ -348,10 +384,18 @@ namespace minesweeper.net
                             freeSpace(new Point(x, y), new Size(Settings.Default.StartSize.Width, Settings.Default.StartSize.Height));
                         }
                         TableDisplay.Refresh();
+                        CheckVictory();
                     }
                     else
                     {
                         MainBtn.Image = Face(Faces.Happy);
+                    }
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    if (e.X >= 0 && e.Y >= 0 && e.X < TableDisplay.Image.Size.Width && e.Y < TableDisplay.Image.Size.Height)
+                    {
+                        CheckVictory();
                     }
                 }
             }
@@ -520,8 +564,11 @@ namespace minesweeper.net
         private void MainBtn_MouseUp(object sender, MouseEventArgs e)
         {
             MainBtnMouseDown = false;
-            MainBtn.Image = Face(Faces.Happy);
-            difficulty(getDifficulty(), Settings.Default.StartMines, Settings.Default.StartSize);
+            if (e.X < 24 && e.Y < 24)
+            {
+                MainBtn.Image = Face(Faces.Happy);
+                difficulty(getDifficulty(), Settings.Default.StartMines, Settings.Default.StartSize);
+            }
         }
     }
 }
