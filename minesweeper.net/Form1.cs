@@ -550,14 +550,7 @@ namespace minesweeper.net
         {
             if (MainBtnMouseDown)
             {
-                if (e.X >= 0 && e.Y >= 0 && e.X < 24 && e.Y < 24)
-                {
-                    MainBtn.Image = Face(Faces.HappyClicked);
-                }
-                else
-                {
-                    MainBtn.Image = Face(Faces.Happy);
-                }
+                MainBtn.Image = (e.X >= 0 && e.Y >= 0 && e.X < 24 && e.Y < 24) ? Face(Faces.HappyClicked) : Face(Faces.Happy);
             }
         }
 
