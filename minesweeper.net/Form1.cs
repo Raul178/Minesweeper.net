@@ -1,4 +1,4 @@
-﻿using minesweeper.net.Properties;
+using minesweeper.net.Properties;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -31,8 +31,7 @@ namespace minesweeper.net
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            counter++;
-            LoadDisplay(TimerDisplay, counter);
+            LoadDisplay(TimerDisplay, ++counter);
         }
 
         void LoadDisplay(PictureBox Display, int number)
@@ -73,17 +72,7 @@ namespace minesweeper.net
 
         void editDigit(object Display, int number, int digit)
         {
-            Point Digit = new Point(0, 0);
-            switch (digit)
-            {
-                case 2:
-                    Digit = new Point(13, 0);
-                    break;
-                case 3:
-                    Digit = new Point(26, 0);
-                    break;
-            }
-            FastGraphicsOver((Bitmap)(Display as PictureBox).Image, Digit.X, Digit.Y, numbers[number]);
+            FastGraphicsOver((Bitmap)(Display as PictureBox).Image, (digit - 1) * 13, 0, numbers[number]);
         }
 
         void changeDim(int height, int width)
@@ -148,14 +137,13 @@ namespace minesweeper.net
             BaseSize = new Size(Size.Width - 256, Size.Height - 256);
             numbers = new Bitmap[12];
 
-            int x = 0;
             for (int i = 11; i >= 0; i--)
             {
                 int y = 253 - (i * 23);
                 numbers[i] = new Bitmap(13, 23);
 
                 using (Graphics g = Graphics.FromImage(numbers[i]))
-                    g.DrawImage(Resources.numbers, new Rectangle(0, 0, 13, 23), new Rectangle(x, y, 13, 23), GraphicsUnit.Pixel);
+                    g.DrawImage(Resources.numbers, new Rectangle(0, 0, 13, 23), new Rectangle(0, y, 13, 23), GraphicsUnit.Pixel);
             }
 
             ResetDisplay(TimerDisplay);
@@ -316,7 +304,7 @@ namespace minesweeper.net
                 if (element == State.Question)
                     cnt2++;
             }
-            if (cnt == Settings.Default.StartMines && cnt2==0)
+            if (cnt == Settings.Default.StartMines && cnt2 == 0)
             {
                 timer1.Enabled = false;
                 MainBtn.Image = Face(Faces.Win);
